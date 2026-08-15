@@ -80,7 +80,12 @@ import {
 } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { LoaderIcon, MoreHorizontalIcon, Trash2Icon } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  LoaderIcon,
+  MoreHorizontalIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { useId, useState } from "react";
 
 export const Route = createFileRoute("/admin/users_/$id")({
@@ -96,10 +101,12 @@ const breadcrumb: BreadcrumbItem[] = [
 
 function RouteComponent() {
   const params = Route.useParams();
-  const { isPending, error } = useQuery(getUserOptions(Number(params.id)));
+  const { data, isPending, error } = useQuery(
+    getUserOptions(Number(params.id)),
+  );
 
   if (isPending) return <UserDetailsLoading />;
-  if (error) return <NotFoundState />;
+  if (error || !data) return <NotFoundState />;
 
   return (
     <AdminPageWrapper pageTitle="Edit User" breadcrumbs={breadcrumb}>
@@ -113,17 +120,28 @@ function RouteComponent() {
 function NotFoundState() {
   return (
     <AdminPageWrapper pageTitle="User Not Found" breadcrumbs={breadcrumb}>
-      <div className="container flex flex-col items-center justify-center py-12">
-        <h2 className="text-3xl font-bold tracking-tight">User not found</h2>
-        <p className="text-muted-foreground mt-4 text-center">
-          The user you&apos;re looking for doesn&apos;t exist.
-        </p>
-        <Link
-          to="/admin/users"
-          className="bg-primary text-primary-foreground mt-8 inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium"
-        >
-          Go Back
-        </Link>
+      <div className="grid min-h-[80vh] place-items-center px-4 text-center">
+        <div className="max-w-md space-y-6">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl">
+              User Not Found
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400">
+              Sorry, we couldn&apos;t find the user you&apos;re looking for. It
+              may have been deleted or never existed.
+            </p>
+          </div>
+          <Button
+            size="lg"
+            nativeButton={false}
+            render={
+              <Link to="/admin/users">
+                <ArrowLeftIcon size={16} />
+                Back to Users
+              </Link>
+            }
+          />
+        </div>
       </div>
     </AdminPageWrapper>
   );

@@ -25,17 +25,12 @@ export const Route = createFileRoute("/admin/products_/$id/edit")({
       }),
     );
 
-    const product = await queryClient.ensureQueryData(
+    await queryClient.ensureQueryData(
       productByIdOptions({
         id: Number(id),
       }),
     );
-
-    if (!product) {
-      throw notFound();
-    }
   },
-
   notFoundComponent: () => <ProductNotFound />,
 });
 
@@ -60,10 +55,6 @@ function RouteComponent() {
       },
     }),
   );
-
-  if (!product) {
-    return <ProductNotFound />;
-  }
 
   return (
     <ProductForm

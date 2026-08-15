@@ -3,17 +3,15 @@ import { Button } from "#/components/ui/button";
 import { CategoryForm } from "#/features/products/components/category-form";
 import { categoryByIdOptions } from "#/features/products/products.queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeftIcon } from "lucide-react";
 
 export const Route = createFileRoute("/admin/product-categories_/$id/edit")({
   component: RouteComponent,
   loader: async ({ context: { queryClient }, params: { id } }) => {
-    const data = await queryClient.ensureQueryData(
+    await queryClient.ensureQueryData(
       categoryByIdOptions({ id: parseInt(id) }),
     );
-
-    if (!data) throw notFound();
   },
   notFoundComponent: () => <CategoryNotFound />,
 });
@@ -22,7 +20,6 @@ function RouteComponent() {
   const params = Route.useParams();
   const id = parseInt(params.id);
   const { data: category } = useSuspenseQuery(categoryByIdOptions({ id }));
-  if (!category) return <CategoryNotFound />;
 
   return (
     <CategoryForm

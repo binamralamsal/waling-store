@@ -1,4 +1,5 @@
 import { jsonArrayFrom, jsonObjectFrom } from "kysely/helpers/postgres";
+import { notFound } from "@tanstack/react-router";
 import pg from "pg";
 import { z } from "zod";
 
@@ -128,6 +129,7 @@ export const getProductByIdFn = createServerFn({ method: "GET" })
     const result = await getProductBasicQuery()
       .where("p.id", "=", data)
       .executeTakeFirst();
+    if (!result) throw notFound();
 
     return result;
   });
@@ -138,6 +140,7 @@ export const getProductBySlugFn = createServerFn({ method: "GET" })
     const result = await getProductBasicQuery()
       .where("p.slug", "=", data)
       .executeTakeFirst();
+    if (!result) throw notFound();
 
     return result;
   });

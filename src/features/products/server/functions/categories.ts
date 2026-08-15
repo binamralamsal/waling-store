@@ -1,4 +1,5 @@
 import pg from "pg";
+import { notFound } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { createServerFn } from "@tanstack/react-start";
@@ -139,6 +140,8 @@ export const getCategoryByIdFn = createServerFn({ method: "GET" })
       )
       .where("id", "=", data)
       .executeTakeFirst();
+
+    if (!result) throw notFound();
 
     return result;
   });

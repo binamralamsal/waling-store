@@ -1,49 +1,74 @@
 import { useEffect, useState } from "react";
-
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 
+import { TopUtilityNav } from "./top-utility-nav";
+import { HeaderSearch } from "./header-search";
+import { CartSheet } from "./cart-sheet";
 import { MobileNav } from "./mobile-nav";
-import { DesktopNav } from "./desktop-nav";
+import { UserAvatarMenu } from "#/components/user-avatar-menu";
+
+import { Button } from "#/components/ui/button";
+import { Skeleton } from "#/components/ui/skeleton";
 
 import { cn } from "#/lib/utils";
 import { site } from "#/config/site";
+import { currentUserOptions } from "#/features/auth/auth.queries";
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
+  const { data, isPending } = useQuery(currentUserOptions());
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 200) {
-        return setScrolled(true);
-      }
-
-      return setScrolled(false);
-    };
-
+    const handleScroll = () => setScrolled(window.scrollY > 200);
     document.addEventListener("scroll", handleScroll);
-
     return () => document.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <header
       className={cn(
-        "w-full py-6",
+        "w-full",
         scrolled &&
-          "animate-headerSticky supports-backdrop-filter:bg-background/85 sticky top-0 z-50 py-4 shadow-[0_8px_30px_rgb(0,0,0,0.05)] backdrop-blur",
+          "animate-headerSticky supports-backdrop-filter:bg-background/85 sticky top-0 z-50 shadow-[0_8px_30px_rgb(0,0,0,0.05)] backdrop-blur",
       )}
     >
-      <div className="container flex items-center justify-between">
-        <Link
-          to="/"
-          className="text-md flex items-center gap-2 font-bold lg:text-2xl"
-        >
-          {/* <VisionWishdomLogo className="size-8" /> */}
-          <span>{site.name}</span>
+      <TopUtilityNav />
+
+      <div className="container flex items-center gap-4 py-4">
+        <Link to="/" className="text-md shrink-0 font-bold lg:text-2xl">
+          {site.name}
         </Link>
 
-        <DesktopNav />
-        <MobileNav />
+        <div className="hidden flex-1 justify-center md:flex">
+          <HeaderSearch />
+        </div>
+
+        <div className="ml-auto flex items-center gap-1 md:ml-0">
+          <CartSheet />
+
+          <div className="hidden md:block">
+            {isPending ? (
+              <Skeleton className="h-9 w-9 rounded-full" />
+            ) : data?.user ? (
+              <UserAvatarMenu user={data.user} />
+            ) : (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="link"
+                  render={<Link to="/login">Login</Link>}
+                  nativeButton={false}
+                />
+                <Button
+                  render={<Link to="/signup">Sign Up</Link>}
+                  nativeButton={false}
+                />
+              </div>
+            )}
+          </div>
+
+          <MobileNav />
+        </div>
       </div>
     </header>
   );
