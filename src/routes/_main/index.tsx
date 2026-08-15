@@ -46,7 +46,7 @@ function App() {
   return (
     <main>
       <section className="container grid gap-4 sm:py-6 lg:grid-cols-[1.15fr_.85fr]">
-        <div className="relative min-h-120 overflow-hidden bg-primary text-primary-foreground sm:min-h-150">
+        <div className="relative min-h-120 overflow-hidden bg-primary text-background sm:min-h-150">
           <img
             src="/images/grocery-hero.png"
             alt="Fresh groceries in a canvas market bag"
@@ -57,9 +57,10 @@ function App() {
               Good food, simply delivered
             </p>
             <h1 className="max-w-xl font-serif text-5xl leading-[.92] sm:text-7xl text-balance">
-              Your best basket starts here.
+              Your <span className="text-primary-foreground">best basket</span>{" "}
+              starts here.
             </h1>
-            <p className="max-w-sm text-sm leading-6 text-primary-foreground/80">
+            <p className="max-w-sm text-sm leading-6 text-background/80">
               Fresh produce, pantry staples, and bakery favorites sourced from
               people who care.
             </p>
@@ -164,7 +165,7 @@ function App() {
         </div>
       </section>
 
-      <section className="bg-secondary py-14 md:py-16 lg:py-20">
+      <section className="bg-secondary/10 py-14 md:py-16 lg:py-20">
         <div className="container">
           <div className="mb-8 flex items-end justify-between gap-4">
             <div>

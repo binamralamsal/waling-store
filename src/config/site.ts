@@ -15,8 +15,8 @@ export const site = {
   url: "https://walingstore.com", // Replace with your actual domain
   email: "support@walingstore.com", // Replace with your actual email
   streetAddress: "Kathmandu",
-  addressLocality: "Waling",
-  telephone: "+977-98XXXXXXXX", // Replace with your actual phone number
+  addressLocality: "Samakhusi",
+  telephone: "+977-9767659204", // Replace with your actual phone number
   // facebook: "https://facebook.com/walingstore",
   // instagram: "https://instagram.com/walingstore",
   // addressRegion: "Gandaki",

@@ -14,6 +14,7 @@ import { Skeleton } from "#/components/ui/skeleton";
 import { cn } from "#/lib/utils";
 import { site } from "#/config/site";
 import { currentUserOptions } from "#/features/auth/auth.queries";
+import { Logo } from "#/features/products/components/logo";
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
@@ -37,7 +38,7 @@ export function SiteHeader() {
 
       <div className="container flex items-center gap-4 py-4">
         <Link to="/" className="text-md shrink-0 font-bold lg:text-2xl">
-          {site.name}
+          <Logo className="w-25" />
         </Link>
 
         <div className="hidden flex-1 justify-center md:flex">
