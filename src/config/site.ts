@@ -14,7 +14,7 @@ export const site = {
     "online grocery, grocery store, fresh vegetables, fresh fruits, daily essentials, household items, supermarket, online shopping, Nepal, Waling Store",
   url: "https://walingstore.com", // Replace with your actual domain
   email: "support@walingstore.com", // Replace with your actual email
-  streetAddress: "Waling Municipality, Syangja",
+  streetAddress: "Kathmandu",
   addressLocality: "Waling",
   telephone: "+977-98XXXXXXXX", // Replace with your actual phone number
   // facebook: "https://facebook.com/walingstore",

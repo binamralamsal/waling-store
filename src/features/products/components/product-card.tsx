@@ -4,7 +4,6 @@ import type { Product, WithContext } from "schema-dts";
 
 import { PlaceholderImage } from "#/components/placeholder-image";
 import { site } from "@/config/site";
-import { cn } from "#/lib/utils";
 
 type ProductCardProps = {
   name: string;
@@ -63,7 +62,6 @@ export function ProductCard({
 
   return (
     <article>
-      {/* Product image */}
       <div className="relative aspect-square overflow-hidden bg-background">
         <Link to={productUrl} className="group block size-full">
           {firstImage?.url ? (
@@ -72,15 +70,10 @@ export function ProductCard({
               alt={name}
               width={600}
               height={600}
-              className={cn(
-                "size-full object-cover transition-transform duration-500",
-                secondImage
-                  ? "group-hover:scale-105 group-hover:opacity-0"
-                  : "group-hover:scale-105",
-              )}
+              className="size-full object-cover"
             />
           ) : (
-            <PlaceholderImage className="size-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <PlaceholderImage className="size-full object-cover" />
           )}
 
           {secondImage?.url && (
@@ -91,24 +84,26 @@ export function ProductCard({
               width={600}
               height={600}
               className="
-                absolute inset-0
-                size-full object-cover
-                opacity-0
-                transition-all duration-500
-                group-hover:scale-105
-                group-hover:opacity-100
-              "
+          absolute inset-0
+          size-full object-cover
+          opacity-0
+          transition-[opacity,transform]
+          duration-500
+          ease-out
+          group-hover:scale-105
+          group-hover:opacity-100
+        "
             />
           )}
 
           {salePrice && (
             <span
               className="
-                absolute top-3 left-3
-                bg-background px-2 py-1
-                text-[10px] font-semibold
-                uppercase tracking-wider
-              "
+          absolute top-3 left-3
+          bg-background px-2 py-1
+          text-[10px] font-semibold
+          uppercase tracking-wider
+        "
             >
               {discount}% off
             </span>
@@ -120,15 +115,15 @@ export function ProductCard({
           type="button"
           aria-label={`Add ${name} to wishlist`}
           className="
-            absolute right-3 bottom-3
-            flex size-9 items-center justify-center
-            rounded-full bg-background
-            shadow-sm
-            opacity-0
-            transition-all duration-200
-            hover:scale-105 hover:bg-background
-            group-hover:opacity-100
-          "
+      absolute right-3 bottom-3
+      flex size-9 items-center justify-center
+      rounded-full bg-background
+      shadow-sm
+      opacity-0
+      transition-all duration-200
+      hover:scale-105 hover:bg-background
+      group-hover:opacity-100
+    "
         >
           <Heart className="size-4" />
         </button>

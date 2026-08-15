@@ -153,7 +153,7 @@ function App() {
                 <img
                   src={category.image.url}
                   alt={category.name}
-                  className=" relative object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="h-full relative object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
               <div className="border-b border-border py-3">

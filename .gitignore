@@ -11,3 +11,8 @@ dist-ssr
 .vinxi
 __unconfig*
 todos.json
+
+
+# Uploaded files
+/public/uploads/*
+!/public/uploads/.gitkeep

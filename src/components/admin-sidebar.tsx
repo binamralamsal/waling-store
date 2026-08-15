@@ -192,7 +192,7 @@ export function AdminSidebar() {
                     />*/}
                   </div>
                   <div className="flex flex-col gap-0.5 leading-none">
-                    <span className="font-semibold">VisionWisdom</span>
+                    <span className="font-semibold">Waling Store</span>
                     <span className="">v1.0.0</span>
                   </div>
                 </Link>
