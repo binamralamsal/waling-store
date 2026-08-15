@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 
 import { PlaceholderImage } from "@/components/placeholder-image";
 import {
@@ -21,141 +21,13 @@ interface ProductImage {
 interface GalleryProps {
   images: ProductImage[];
   inSale?: boolean;
-  activeImageIndex: number;
-  onActiveImageChange: (index: number) => void;
+  activeImageIndex?: number;
+  onActiveImageChange?: (index: number) => void;
 }
 
-interface ThumbnailProps {
-  image: ProductImage;
-  isActive: boolean;
-  onClick: () => void;
-  className?: string;
-}
+const THUMBNAIL_SIZE = 80;
 
-const THUMBNAIL_DIMENSIONS = {
-  width: 30,
-  height: 30,
-};
-
-const MAIN_IMAGE_DIMENSIONS = {
-  width: 600,
-  height: 600,
-};
-
-function ImageThumbnail({
-  image,
-  isActive,
-  onClick,
-  className,
-}: ThumbnailProps) {
-  return (
-    <button
-      onClick={onClick}
-      aria-label={`View ${image.name}`}
-      className="w-full"
-    >
-      <img
-        src={image.url}
-        alt={image.name}
-        width={THUMBNAIL_DIMENSIONS.width}
-        height={THUMBNAIL_DIMENSIONS.height}
-        className={cn(
-          "h-20 w-full border-b-2 border-transparent bg-gray-100 object-contain p-3 transition",
-          isActive && "border-primary",
-          className,
-        )}
-        loading="lazy"
-      />
-    </button>
-  );
-}
-
-function NavigationButtons() {
-  const { canScrollNext, canScrollPrev } = useCarousel();
-
-  if (!canScrollNext && !canScrollPrev) return null;
-
-  return (
-    <>
-      {canScrollPrev && (
-        <CarouselPrevious
-          variant="default"
-          className="left-0 h-full rounded-none border-0 bg-black/20 opacity-0 transition duration-500 hover:opacity-80"
-        />
-      )}
-      {canScrollNext && (
-        <CarouselNext
-          variant="default"
-          className="right-0 h-full rounded-none border-0 bg-black/20 opacity-0 transition duration-500 hover:opacity-80"
-        />
-      )}
-    </>
-  );
-}
-
-export function ProductImagesGallery({
-  images,
-  inSale = false,
-  activeImageIndex,
-  onActiveImageChange,
-}: GalleryProps) {
-  const activeImage = useMemo(
-    () => images[activeImageIndex],
-    [images, activeImageIndex],
-  );
-
-  if (!activeImage) {
-    return <PlaceholderImage className="h-[30rem] w-full md:h-[40rem]" />;
-  }
-
-  return (
-    <div className="product-gallery">
-      <div className="relative">
-        {images.map((image, index) => (
-          <img
-            key={image.id}
-            src={image.url}
-            alt={image.name}
-            width={MAIN_IMAGE_DIMENSIONS.width}
-            height={MAIN_IMAGE_DIMENSIONS.height}
-            className={cn(
-              "h-[30rem] w-full bg-gray-100 object-contain opacity-0 transition duration-500 md:h-[40rem]",
-              index > 0 && "absolute bottom-0 left-0",
-              activeImageIndex === index && "opacity-100",
-            )}
-          />
-        ))}
-
-        {inSale && (
-          <div className="bg-primary text-primary-foreground absolute top-4 left-0 px-4 py-1 text-sm uppercase">
-            Sale
-          </div>
-        )}
-        <div className="bg-background/80 absolute right-4 bottom-4 px-4 py-1 text-sm backdrop-blur-sm">
-          {activeImageIndex + 1} / {images.length}
-        </div>
-      </div>
-
-      <Carousel className="mt-4 max-w-[92vw]">
-        <CarouselContent>
-          {images.map((image, index) => (
-            <CarouselItem key={image.id} className="basis-auto">
-              <ThumbnailCarousel
-                image={image}
-                index={index}
-                activeImageIndex={activeImageIndex}
-                onActiveImageChange={onActiveImageChange}
-              />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <NavigationButtons />
-      </Carousel>
-    </div>
-  );
-}
-
-function ThumbnailCarousel({
+function Thumbnail({
   image,
   index,
   activeImageIndex,
@@ -171,18 +43,198 @@ function ThumbnailCarousel({
   useEffect(() => {
     if (!api) return;
 
-    const timeoutId = setTimeout(() => {
-      api.scrollTo(activeImageIndex);
-    }, 100);
-
-    return () => clearTimeout(timeoutId);
+    api.scrollTo(activeImageIndex);
   }, [api, activeImageIndex]);
 
   return (
-    <ImageThumbnail
-      image={image}
-      isActive={activeImageIndex === index}
-      onClick={() => onActiveImageChange(index)}
-    />
+    <CarouselItem
+      className="
+        basis-auto
+        sm:basis-auto
+        md:ml-1
+      "
+    >
+      <button
+        type="button"
+        onClick={() => onActiveImageChange(index)}
+        aria-label={`View ${image.name}`}
+        className={cn(
+          `
+            relative
+            size-20
+            shrink-0
+            overflow-hidden
+            bg-muted
+            transition
+          `,
+          activeImageIndex === index
+            ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
+            : "opacity-65 hover:opacity-100",
+        )}
+      >
+        <img
+          src={image.url}
+          alt={image.name}
+          width={THUMBNAIL_SIZE}
+          height={THUMBNAIL_SIZE}
+          className="size-full object-cover"
+          loading="lazy"
+        />
+      </button>
+    </CarouselItem>
+  );
+}
+
+function ThumbnailNavigation() {
+  const { canScrollNext, canScrollPrev } = useCarousel();
+
+  if (!canScrollNext && !canScrollPrev) {
+    return null;
+  }
+
+  return (
+    <>
+      <CarouselPrevious
+        variant="ghost"
+        className="
+          left-1/2
+          top-0
+          size-7
+          -translate-x-1/2
+          -translate-y-1/2
+          rotate-90
+          rounded-full
+          bg-background
+          shadow-sm
+          sm:left-1/2
+        "
+      />
+
+      <CarouselNext
+        variant="ghost"
+        className="
+          bottom-0
+          left-1/2
+          top-auto
+          size-7
+          -translate-x-1/2
+          translate-y-1/2
+          rotate-90
+          rounded-full
+          bg-background
+          shadow-sm
+          sm:left-1/2
+        "
+      />
+    </>
+  );
+}
+
+export function ProductImagesGallery({
+  images,
+  inSale = false,
+  activeImageIndex: controlledIndex,
+  onActiveImageChange,
+}: GalleryProps) {
+  const activeImageIndex = controlledIndex ?? 0;
+
+  const activeImage = images[activeImageIndex] ?? images[0];
+
+  if (!activeImage) {
+    return <PlaceholderImage className="aspect-square w-full bg-muted" />;
+  }
+
+  return (
+    <div className="grid gap-3 sm:grid-cols-[5.5rem_minmax(0,1fr)]">
+      <div className="order-2 min-w-0 sm:order-1">
+        <Carousel
+          orientation="vertical"
+          opts={{
+            align: "start",
+          }}
+          className="hidden h-full sm:block"
+        >
+          <CarouselContent className="h-full max-h-160">
+            {images.map((image, index) => (
+              <Thumbnail
+                key={image.id}
+                image={image}
+                index={index}
+                activeImageIndex={activeImageIndex}
+                onActiveImageChange={onActiveImageChange ?? (() => {})}
+              />
+            ))}
+          </CarouselContent>
+
+          <ThumbnailNavigation />
+        </Carousel>
+
+        <Carousel
+          opts={{
+            align: "start",
+          }}
+          className="w-full sm:hidden"
+        >
+          <CarouselContent className="gap-2">
+            {images.map((image, index) => (
+              <Thumbnail
+                key={image.id}
+                image={image}
+                index={index}
+                activeImageIndex={activeImageIndex}
+                onActiveImageChange={onActiveImageChange ?? (() => {})}
+              />
+            ))}
+          </CarouselContent>
+
+          <CarouselPrevious className="left-1" />
+          <CarouselNext className="right-1" />
+        </Carousel>
+      </div>
+
+      <div className="order-1 relative aspect-square overflow-hidden bg-muted sm:order-2">
+        <img
+          src={activeImage.url}
+          alt={activeImage.name}
+          width={600}
+          height={600}
+          className="
+            size-full
+            object-contain
+          "
+        />
+
+        {inSale && (
+          <span
+            className="
+              absolute
+              top-4 left-4
+              bg-primary
+              px-3 py-1
+              text-xs
+              font-semibold
+              uppercase
+              tracking-wider
+              text-primary-foreground
+            "
+          >
+            Sale
+          </span>
+        )}
+
+        <span
+          className="
+            absolute
+            right-4 bottom-4
+            bg-background/85
+            px-3 py-1
+            text-xs
+            backdrop-blur
+          "
+        >
+          {activeImageIndex + 1} / {images.length}
+        </span>
+      </div>
+    </div>
   );
 }
