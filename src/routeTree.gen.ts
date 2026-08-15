@@ -24,6 +24,7 @@ import { Route as AdminProductCategoriesRouteImport } from './routes/admin/produ
 import { Route as AdminProductsRouteImport } from './routes/admin/products'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as ApiUploadRouteImport } from './routes/api.upload'
+import { Route as MainShopSlugRouteImport } from './routes/_main/shop_.$slug'
 import { Route as AdminProductCategoriesNewRouteImport } from './routes/admin/product-categories_.new'
 import { Route as AdminProductsNewRouteImport } from './routes/admin/products_.new'
 import { Route as AdminUsersIdRouteImport } from './routes/admin/users_.$id'
@@ -106,6 +107,11 @@ const ApiUploadRoute = ApiUploadRouteImport.update({
   path: '/api/upload',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MainShopSlugRoute = MainShopSlugRouteImport.update({
+  id: '/shop_/$slug',
+  path: '/shop/$slug',
+  getParentRoute: () => MainRouteRoute,
+} as any)
 const AdminProductCategoriesNewRoute =
   AdminProductCategoriesNewRouteImport.update({
     id: '/product-categories_/new',
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/api/upload': typeof ApiUploadRoute
   '/admin/': typeof AdminIndexRoute
+  '/shop/$slug': typeof MainShopSlugRoute
   '/admin/product-categories/new': typeof AdminProductCategoriesNewRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/api/upload': typeof ApiUploadRoute
   '/': typeof MainIndexRoute
   '/admin': typeof AdminIndexRoute
+  '/shop/$slug': typeof MainShopSlugRoute
   '/admin/product-categories/new': typeof AdminProductCategoriesNewRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
@@ -206,6 +214,7 @@ export interface FileRoutesById {
   '/api/upload': typeof ApiUploadRoute
   '/_main/': typeof MainIndexRoute
   '/admin/': typeof AdminIndexRoute
+  '/_main/shop_/$slug': typeof MainShopSlugRoute
   '/admin/product-categories_/new': typeof AdminProductCategoriesNewRoute
   '/admin/products_/new': typeof AdminProductsNewRoute
   '/admin/users_/$id': typeof AdminUsersIdRoute
@@ -231,6 +240,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/api/upload'
     | '/admin/'
+    | '/shop/$slug'
     | '/admin/product-categories/new'
     | '/admin/products/new'
     | '/admin/users/$id'
@@ -253,6 +263,7 @@ export interface FileRouteTypes {
     | '/api/upload'
     | '/'
     | '/admin'
+    | '/shop/$slug'
     | '/admin/product-categories/new'
     | '/admin/products/new'
     | '/admin/users/$id'
@@ -277,6 +288,7 @@ export interface FileRouteTypes {
     | '/api/upload'
     | '/_main/'
     | '/admin/'
+    | '/_main/shop_/$slug'
     | '/admin/product-categories_/new'
     | '/admin/products_/new'
     | '/admin/users_/$id'
@@ -400,6 +412,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiUploadRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_main/shop_/$slug': {
+      id: '/_main/shop_/$slug'
+      path: '/shop/$slug'
+      fullPath: '/shop/$slug'
+      preLoaderRoute: typeof MainShopSlugRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
     '/admin/product-categories_/new': {
       id: '/admin/product-categories_/new'
       path: '/product-categories/new'
@@ -459,6 +478,7 @@ interface MainRouteRouteChildren {
   MainShopRoute: typeof MainShopRoute
   MainSignupRoute: typeof MainSignupRoute
   MainIndexRoute: typeof MainIndexRoute
+  MainShopSlugRoute: typeof MainShopSlugRoute
 }
 
 const MainRouteRouteChildren: MainRouteRouteChildren = {
@@ -468,6 +488,7 @@ const MainRouteRouteChildren: MainRouteRouteChildren = {
   MainShopRoute: MainShopRoute,
   MainSignupRoute: MainSignupRoute,
   MainIndexRoute: MainIndexRoute,
+  MainShopSlugRoute: MainShopSlugRoute,
 }
 
 const MainRouteRouteWithChildren = MainRouteRoute._addFileChildren(

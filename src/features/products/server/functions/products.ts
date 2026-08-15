@@ -152,7 +152,7 @@ export const getAllProductsFn = createServerFn({ method: "GET" })
       data;
 
     function createBaseQuery() {
-      let query = getProductBasicQuery().groupBy(["p.id", "categories.name"]);
+      let query = getProductBasicQuery();
 
       if (search?.trim()) {
         const searchTerm = `%${search.trim()}%`;
@@ -200,14 +200,19 @@ export const getAllProductsFn = createServerFn({ method: "GET" })
     const offset = Math.max(0, (page - 1) * pageSize);
     productsQuery = productsQuery.limit(pageSize).offset(offset);
 
-    const countQuery = createBaseQuery().select(db.fn.countAll().as("count"));
+    // clearSelect() drops the p.id / category / images columns from
+    // getProductBasicQuery() so we're left with just countAll() — no
+    // mixing of aggregate + non-aggregate columns, no GROUP BY needed.
+    const countQuery = createBaseQuery()
+      .clearSelect()
+      .select((eb) => eb.fn.countAll().as("count"));
 
     const [products, countResult] = await Promise.all([
       productsQuery.execute(),
       countQuery.executeTakeFirst(),
     ]);
 
-    const totalCount = Number(countResult?.count || 0);
+    const totalCount = Number(countResult?.count ?? 0);
     const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
     return {

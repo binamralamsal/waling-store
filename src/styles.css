@@ -47,6 +47,16 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  --animate-headerSticky: headerSticky var(--duration, 0.5s) ease-in-out;
+  @keyframes headerSticky {
+    0% {
+      transform: translateY(-100%);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
 }
 
 :root {
@@ -116,16 +126,6 @@
   --sidebar-accent-foreground: oklch(0.988 0.003 106.5);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.58 0.031 107.3);
-
-  --animate-headerSticky: headerSticky var(--duration, 0.5s) ease-in-out;
-  @keyframes headerSticky {
-    0% {
-      transform: translateY(-100%);
-    }
-    100% {
-      transform: translateY(0);
-    }
-  }
 }
 
 @utility container {

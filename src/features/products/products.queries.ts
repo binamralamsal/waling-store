@@ -49,7 +49,7 @@ export const allProductsOptions = ({
   values: Partial<GetAllProductsSchema>;
 }) =>
   queryOptions({
-    queryKey: ["categories", values],
+    queryKey: ["products", values],
     queryFn: () => getAllProductsFn({ data: values }),
     placeholderData: keepPreviousData,
   });

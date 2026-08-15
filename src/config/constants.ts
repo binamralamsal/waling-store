@@ -16,6 +16,8 @@ export const SESSION_REFRESH_TIME = SESSION_LIFETIME / 2;
 export const SESSION_COOKIE_NAME = "session";
 
 export const DATATABLE_PAGE_SIZE = 15;
+export const MIN_PRICE_RANGE = 0;
+export const MAX_PRICE_RANGE = 20_000;
 
 export const IMAGE_EXTENSIONS = [
   ".jpg",
