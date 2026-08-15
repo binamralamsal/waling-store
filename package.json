@@ -7,6 +7,7 @@
   },
   "scripts": {
     "dev": "vite dev --port 3000",
+    "start": "node --env-file=.env .output/server/index.mjs",
     "generate-routes": "tsr generate",
     "build": "vite build",
     "preview": "vite preview",
@@ -17,7 +18,10 @@
     "db:migrate": "kysely migrate",
     "db:seed": "kysely seed",
     "db:codegen": "kysely-codegen --out-file ./src/types/database-schemas.ts --singularize --camel-case",
-    "create:user": "bun run src/util/create-user.ts"
+    "create:user": "bun run src/util/create-user.ts",
+    "download:maxmind": "run-script-os",
+    "download:maxmind:win32": "powershell -ExecutionPolicy Bypass -File ./download-maxmind-db.ps1",
+    "download:maxmind:linux": "sh ./download-maxmind-db.sh"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -80,6 +84,7 @@
     "jsdom": "^28.1.0",
     "kysely-codegen": "^0.20.0",
     "prettier": "^3.8.1",
+    "run-script-os": "^1.1.6",
     "typescript": "^6.0.2",
     "vite": "^8.0.0",
     "vitest": "^4.1.5"
