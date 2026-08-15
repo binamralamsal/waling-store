@@ -38,6 +38,7 @@ export function FormPasswordInput(
           title={isVisible ? "Hide Password" : "Show Password"}
           size="icon-xs"
           onClick={() => setIsVisible((prev) => !prev)}
+          type="button"
         >
           {!isVisible ? <EyeIcon /> : <EyeOffIcon />}
         </InputGroupButton>

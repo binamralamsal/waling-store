@@ -42,9 +42,11 @@ export function AdminPageWrapper({
               {breadcrumbs?.map((breadcrumb) => (
                 <Fragment key={breadcrumb.href}>
                   <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink asChild>
-                      <Link to={breadcrumb.href}>{breadcrumb.label}</Link>
-                    </BreadcrumbLink>
+                    <BreadcrumbLink
+                      render={
+                        <Link to={breadcrumb.href}>{breadcrumb.label}</Link>
+                      }
+                    />
                   </BreadcrumbItem>
 
                   <BreadcrumbSeparator className="hidden md:block" />

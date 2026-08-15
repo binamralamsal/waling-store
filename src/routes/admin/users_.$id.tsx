@@ -2,7 +2,19 @@ import { AdminPageWrapper } from "#/components/admin-page-wrapper";
 import type { BreadcrumbItem } from "#/components/admin-page-wrapper";
 import { FormNavigationBlocker } from "#/components/form-navigation-blocker";
 import { useAppForm } from "#/components/form/hooks";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "#/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "#/components/ui/avatar";
+import { Badge } from "#/components/ui/badge";
+import { Button } from "#/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,6 +22,21 @@ import {
   CardHeader,
   CardTitle,
 } from "#/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "#/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "#/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
@@ -20,12 +47,30 @@ import {
 import { useSidebar } from "#/components/ui/sidebar";
 import { Skeleton } from "#/components/ui/skeleton";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "#/components/ui/table";
+import { toast } from "#/components/ui/toast";
+import {
   currentUserOptions,
   getUserOptions,
 } from "#/features/auth/auth.queries";
-import { updateUserSchema } from "#/features/auth/auth.schema";
+import {
+  changePasswordClientSchema,
+  updateUserSchema,
+} from "#/features/auth/auth.schema";
 import type { UpdateUserSchemaInput } from "#/features/auth/auth.schema";
-import { updateUserFn } from "#/features/auth/server/functions/admin-user";
+import {
+  changeUserPasswordFn,
+  deleteUserFn,
+  terminateSessionFn,
+  updateUserFn,
+} from "#/features/auth/server/functions/admin-user";
+import { logoutUserFn } from "#/features/auth/server/functions/user";
 import { cn } from "#/lib/utils";
 import {
   useMutation,
@@ -33,11 +78,10 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { LoaderIcon } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
+import { LoaderIcon, MoreHorizontalIcon, Trash2Icon } from "lucide-react";
+import { useId, useState } from "react";
 
 export const Route = createFileRoute("/admin/users_/$id")({
   component: RouteComponent,
@@ -201,7 +245,7 @@ export function UserDetailsForm() {
   const updateUserMutation = useMutation({
     mutationFn: updateUser,
     onSuccess: async (response) => {
-      toast.success(response.message);
+      toast.add({ type: "success", description: response.message });
       await queryClient.invalidateQueries(getUserOptions(userId));
       if (currentUser?.user.id === userId) {
         await queryClient.invalidateQueries(currentUserOptions());
@@ -311,7 +355,13 @@ export function UserDetailsForm() {
                         aria-label="Select a role suitable for this user"
                         className="w-full"
                       >
-                        <SelectValue placeholder="Select role" />
+                        <SelectValue placeholder="Select role">
+                          {field.state.value === "admin"
+                            ? "Administrator"
+                            : field.state.value === "user"
+                              ? "Normal User"
+                              : null}
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="user">Normal User</SelectItem>
@@ -352,21 +402,20 @@ function ChangePasswordForm() {
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
 
   const params = Route.useParams();
+  const userId = parseInt(params.id);
   const queryClient = useQueryClient();
 
-  const changeUserPasswordMutation = useMutation(
-    api.users.admin.changePassword.mutationOptions({
-      onSuccess: async (response) => {
-        setIsPasswordDialogOpen(false);
+  const changePassword = useServerFn(changeUserPasswordFn);
 
-        toast.success(response.message);
-        form.reset();
-        queryClient.invalidateQueries(
-          api.users.admin.get.queryOptions({ input: { params } }),
-        );
-      },
-    }),
-  );
+  const changeUserPasswordMutation = useMutation({
+    mutationFn: changePassword,
+    onSuccess: async (response) => {
+      setIsPasswordDialogOpen(false);
+      toast.add({ type: "success", description: response.message });
+      form.reset();
+      queryClient.invalidateQueries(getUserOptions(userId));
+    },
+  });
   const form = useAppForm({
     defaultValues: {
       newPassword: "",
@@ -377,8 +426,10 @@ function ChangePasswordForm() {
     },
     onSubmit: async ({ value }) => {
       await changeUserPasswordMutation.mutateAsync({
-        body: { password: value.newPassword },
-        params,
+        data: {
+          id: userId,
+          newPassword: value.newPassword,
+        },
       });
     },
   });
@@ -387,11 +438,13 @@ function ChangePasswordForm() {
 
   return (
     <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="lg" className="w-full md:w-auto">
-          Change Password
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          <Button variant="outline" size="lg" className="w-full md:w-auto">
+            Change Password
+          </Button>
+        }
+      />
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Change Password</DialogTitle>
@@ -413,7 +466,7 @@ function ChangePasswordForm() {
             children={(field) => (
               <field.FormField>
                 <field.FormLabel>New Password</field.FormLabel>
-                <field.FormInput placeholder="********" type="password" />
+                <field.FormPasswordInput placeholder="********" />
                 <field.FormError />
               </field.FormField>
             )}
@@ -423,7 +476,7 @@ function ChangePasswordForm() {
             children={(field) => (
               <field.FormField>
                 <field.FormLabel>Confirm Password</field.FormLabel>
-                <field.FormInput placeholder="********" type="password" />
+                <field.FormPasswordInput placeholder="********" />
                 <field.FormError />
               </field.FormField>
             )}
@@ -450,32 +503,29 @@ function ChangePasswordForm() {
 
 export function ActiveSessionsTable() {
   const params = Route.useParams();
+  const userId = parseInt(params.id);
   const navigate = useNavigate();
 
-  const logoutUserMutation = useMutation(
-    api.users.logout.mutationOptions({
-      onSuccess: () => {
-        navigate({ to: "/login" });
-      },
-    }),
-  );
+  const logoutUser = useServerFn(logoutUserFn);
+  const logoutUserMutation = useMutation({
+    mutationFn: logoutUser,
+    onSuccess: () => {
+      navigate({ to: "/login" });
+    },
+  });
 
   const queryClient = useQueryClient();
 
-  const terminateUserMutation = useMutation(
-    api.users.admin.terminateSession.mutationOptions({
-      onSuccess: async (data) => {
-        toast.success(data.message);
-        queryClient.invalidateQueries(
-          api.users.admin.get.queryOptions({ input: { params } }),
-        );
-      },
-    }),
-  );
+  const terminateSession = useServerFn(terminateSessionFn);
+  const terminateUserMutation = useMutation({
+    mutationFn: terminateSession,
+    onSuccess: async (data) => {
+      toast.add({ type: "success", description: data.message });
+      queryClient.invalidateQueries(getUserOptions(userId));
+    },
+  });
 
-  const { data: user } = useSuspenseQuery(
-    api.users.admin.get.queryOptions({ input: { params } }),
-  );
+  const { data: user } = useSuspenseQuery(getUserOptions(userId));
 
   return (
     <Card className="container px-0">
@@ -497,14 +547,14 @@ export function ActiveSessionsTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {user.sessions.length === 0 && (
+              {user?.sessions.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={4} className="h-24 text-center">
                     No results.
                   </TableCell>
                 </TableRow>
               )}
-              {user.sessions.map((session) => (
+              {user?.sessions.map((session) => (
                 <TableRow key={session.id}>
                   <TableCell className="p-4 font-medium">
                     {session.ip}
@@ -524,12 +574,14 @@ export function ActiveSessionsTable() {
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
+                      <DropdownMenuTrigger
+                        render={
+                          <Button variant="ghost" size="icon">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontalIcon className="h-4 w-4" />
+                          </Button>
+                        }
+                      />
                       <DropdownMenuContent align="end">
                         {session.isCurrent ? (
                           <DropdownMenuItem
@@ -543,7 +595,7 @@ export function ActiveSessionsTable() {
                             className="text-destructive focus:text-destructive"
                             onClick={() =>
                               terminateUserMutation.mutateAsync({
-                                params: { id: session.id },
+                                data: session.id,
                               })
                             }
                           >
@@ -565,26 +617,23 @@ export function ActiveSessionsTable() {
 
 export function DangerZoneCard() {
   const params = Route.useParams();
-  const { data: user } = useSuspenseQuery(
-    api.users.admin.get.queryOptions({ input: { params } }),
-  );
-  const { data: currentUser } = useSuspenseQuery(
-    api.users.current.user.queryOptions(),
-  );
+  const userId = parseInt(params.id);
+  const { data: user } = useSuspenseQuery(getUserOptions(userId));
+  const { data: currentUser } = useSuspenseQuery(currentUserOptions());
   const navigate = useNavigate();
 
   const [deleteDialogOpened, setDeleteDialogOpened] = useState(false);
 
   const isDeletingCurrentUser = currentUser?.user.id === user?.id;
-  const deleteUserMutation = useMutation(
-    api.users.admin.delete.mutationOptions({
-      onSuccess: async (data) => {
-        setDeleteDialogOpened(false);
-        toast.success(data.message);
-        navigate({ to: "/admin/users" });
-      },
-    }),
-  );
+  const deleteUser = useServerFn(deleteUserFn);
+  const deleteUserMutation = useMutation({
+    mutationFn: deleteUser,
+    onSuccess: async (data) => {
+      setDeleteDialogOpened(false);
+      toast.add({ type: "success", description: data.message });
+      navigate({ to: "/admin/users" });
+    },
+  });
 
   if (!user || !currentUser) return null;
 
@@ -614,16 +663,18 @@ export function DangerZoneCard() {
                 open={deleteDialogOpened}
                 onOpenChange={setDeleteDialogOpened}
               >
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    className="flex items-center gap-2"
-                  >
-                    <Trash2Icon className="h-4 w-4" />
-                    Delete User
-                  </Button>
-                </AlertDialogTrigger>
+                <AlertDialogTrigger
+                  render={
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="flex items-center gap-2"
+                    >
+                      <Trash2Icon className="h-4 w-4" />
+                      Delete User
+                    </Button>
+                  }
+                />
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>
@@ -639,7 +690,9 @@ export function DangerZoneCard() {
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <Button
                       variant="destructive"
-                      onClick={() => deleteUserMutation.mutateAsync({ params })}
+                      onClick={() =>
+                        deleteUserMutation.mutateAsync({ data: userId })
+                      }
                     >
                       Delete
                     </Button>

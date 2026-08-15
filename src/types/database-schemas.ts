@@ -9,9 +9,30 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>;
 
+export type ProductStatus = "archived" | "draft" | "published";
+
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export type UserRole = "admin" | "user";
+
+export interface Category {
+  createdAt: Generated<Timestamp>;
+  id: Generated<number>;
+  imageId: number;
+  name: string;
+  slug: string;
+  updatedAt: Generated<Timestamp>;
+}
+
+export interface ContactEntry {
+  createdAt: Generated<Timestamp>;
+  email: string;
+  id: Generated<number>;
+  message: string;
+  name: string;
+  phone: string;
+  updatedAt: Generated<Timestamp>;
+}
 
 export interface Email {
   createdAt: Generated<Timestamp>;
@@ -21,6 +42,25 @@ export interface Email {
   isVerified: Generated<boolean>;
   updatedAt: Generated<Timestamp>;
   userId: number;
+}
+
+export interface ProductFile {
+  fileId: number;
+  productId: number;
+}
+
+export interface Product {
+  categoryId: number | null;
+  createdAt: Generated<Timestamp>;
+  description: string;
+  id: Generated<number>;
+  name: string;
+  price: number;
+  salePrice: number | null;
+  slug: string;
+  status: Generated<ProductStatus>;
+  unit: string;
+  updatedAt: Generated<Timestamp>;
 }
 
 export interface Session {
@@ -36,6 +76,14 @@ export interface Session {
   userId: number;
 }
 
+export interface UploadedFile {
+  fileType: string;
+  id: Generated<number>;
+  name: string;
+  uploadedAt: Generated<Timestamp>;
+  url: string;
+}
+
 export interface User {
   createdAt: Generated<Timestamp>;
   id: Generated<number>;
@@ -46,7 +94,12 @@ export interface User {
 }
 
 export interface DB {
+  categories: Category;
+  contactEntries: ContactEntry;
   emails: Email;
+  productFiles: ProductFile;
+  products: Product;
   sessions: Session;
+  uploadedFiles: UploadedFile;
   users: User;
 }

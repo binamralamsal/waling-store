@@ -19,7 +19,6 @@ export const Route = createFileRoute("/admin")({
   beforeLoad: async ({ context, location: { pathname } }) => {
     const response =
       await context.queryClient.ensureQueryData(currentUserOptions());
-    console.log(response);
     if (response && response.user.role !== "admin") throw redirect({ to: "/" });
     if (!response)
       throw redirect({ to: "/login", search: { redirect_url: pathname } });

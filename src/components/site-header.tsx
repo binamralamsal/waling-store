@@ -4,7 +4,6 @@ import { Link } from "@tanstack/react-router";
 
 import { MobileNav } from "./mobile-nav";
 import { DesktopNav } from "./desktop-nav";
-// import { VisionWishdomLogo } from "./logo";
 
 import { cn } from "#/lib/utils";
 import { site } from "#/config/site";

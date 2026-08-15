@@ -1,5 +1,3 @@
-import { toast } from "sonner";
-
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -19,6 +17,7 @@ import { cn } from "#/lib/utils";
 import { useServerFn } from "@tanstack/react-start";
 import { registerUserFn } from "../server/functions/user";
 import { currentUserOptions } from "../auth.queries";
+import { toast } from "#/components/ui/toast";
 
 export function RegisterForm({
   className,
@@ -51,13 +50,13 @@ export function RegisterForm({
       const response = await mutation.mutateAsync({ data: registerData });
       if (response.status === "SUCCESS") {
         form.reset();
-        toast.success(response.message);
+        toast.add({ type: "success", description: response.message });
         navigate({
           href: redirectUrl || "/",
         });
         queryClient.invalidateQueries(currentUserOptions());
       } else {
-        toast.error(response.message);
+        toast.add({ type: "error", description: response.message });
       }
     },
   });

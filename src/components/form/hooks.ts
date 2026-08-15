@@ -9,6 +9,7 @@ import { FormCheckbox } from "./form-checkbox";
 import { FormTextarea } from "./form-textarea";
 import { FormPasswordInput } from "./form-password-input";
 import { Field, FieldDescription, FieldGroup } from "../ui/field";
+import { FormSelectTrigger } from "./form-select-trigger";
 
 const { fieldContext, formContext, useFieldContext, useFormContext } =
   createFormHookContexts();
@@ -23,6 +24,7 @@ const { useAppForm, withForm } = createFormHook({
     FormPasswordInput,
     FormTextarea,
     FormCheckbox,
+    FormSelectTrigger,
   },
   formComponents: {
     FormGroup: FieldGroup,

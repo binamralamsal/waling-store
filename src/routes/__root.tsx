@@ -11,8 +11,9 @@ import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
 
 import type { QueryClient } from "@tanstack/react-query";
-import { Toaster } from "#/components/ui/sonner";
 import { TooltipProvider } from "#/components/ui/tooltip";
+import { ConfirmProvider } from "#/components/confirm-alert";
+import { Toaster } from "#/components/ui/toast";
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -49,7 +50,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
+        <TooltipProvider>
+          <ConfirmProvider>{children}</ConfirmProvider>
+        </TooltipProvider>
         <TanStackDevtools
           config={{
             position: "bottom-right",
@@ -62,8 +65,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             TanStackQueryDevtools,
           ]}
         />
-        <Toaster richColors />
-        <TooltipProvider />
+        <Toaster />
         <Scripts />
       </body>
     </html>

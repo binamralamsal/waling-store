@@ -1,5 +1,3 @@
-import { toast } from "sonner";
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { redirect, useNavigate, useSearch } from "@tanstack/react-router";
 
@@ -19,6 +17,7 @@ import { cn } from "#/lib/utils";
 import { useServerFn } from "@tanstack/react-start";
 import { loginUserFn } from "../server/functions/user";
 import { currentUserOptions } from "../auth.queries";
+import { toast } from "#/components/ui/toast";
 
 export function LoginForm({
   className,
@@ -47,13 +46,19 @@ export function LoginForm({
       const response = await mutation.mutateAsync({ data: value });
 
       if (response.status === "SUCCESS") {
-        toast.success(response.message);
+        toast.add({
+          type: "success",
+          description: response.message,
+        });
         await queryClient.invalidateQueries(currentUserOptions());
         navigate({
           href: redirectUrl || "/",
         });
       } else {
-        toast.error(response.message);
+        toast.add({
+          type: "error",
+          description: response.message,
+        });
       }
     },
   });
